@@ -4,9 +4,9 @@ server:
 cloud:
   aws:
     region:
-      static: ${S3_REGION}
+      static: ${S3_REGION:ap-northeast-2}
     s3:
-      bucket: ${S3_BUCKETNAME}
+      bucket: ${S3_BUCKETNAME:artipcik-s3}
 
 spring:
   profiles:
@@ -15,9 +15,9 @@ spring:
       - secret
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:artipick}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:1234}
 
   jpa:
     hibernate:
