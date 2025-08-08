@@ -43,4 +43,3 @@ out/
 **/*.properties
 !gradle/wrapper/gradle-wrapper.properties
 src/main/resources/application-secret.yml
-/.github/
