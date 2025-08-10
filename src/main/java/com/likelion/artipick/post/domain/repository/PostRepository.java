@@ -1,4 +1,4 @@
-package com.likelion.artipick.post.repository;
+package com.likelion.artipick.post.domain.repository;
 
 import com.likelion.artipick.post.domain.Post;
 import org.springframework.data.domain.Page;
