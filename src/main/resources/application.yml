@@ -34,8 +34,8 @@ jwt:
     expiration: ${JWT_ACCESS_EXPIRATION:3600000}
     header: ${JWT_ACCESS_HEADER:Authorization}
   refresh:
-    expiration: ${JWT_REFRESH_EXPIRATION:604800000}
-    header: ${JWT_REFRESH_HEADER:Authorization-refresh}
+    expiration: ${JWT_REFRESH_EXPIRATION:3600000}
+    header: ${JWT_REFRESH_HEADER:RefreshToken}
 
 # Springdoc (Swagger UI)
 springdoc:

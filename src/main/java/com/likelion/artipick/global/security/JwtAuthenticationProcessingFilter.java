@@ -10,18 +10,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
-
-    private static final String REISSUE_URL = "/auth/reissue";
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -29,50 +29,66 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // 1. 토큰 재발급 요청인 경우
-        if (request.getRequestURI().equals(REISSUE_URL)) {
-            String refreshToken = jwtService.extractRefreshToken(request)
-                    .filter(jwtService::isTokenValid)
-                    .orElse(null);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
-            if (refreshToken != null) {
-                checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
-                return; // 재발급 후 필터 종료
-            }
-            // 재발급 요청에 유효한 리프레시 토큰이 없으면 그냥 통과 (뒤에서 403 처리됨)
+        if (request.getRequestURI().equals("/auth/login")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. 일반 API 요청인 경우 (AccessToken 확인)
+        String refreshToken = jwtService.extractRefreshToken(request)
+                .filter(jwtService::isTokenValid)
+                .orElse(null);
+
+        if (refreshToken != null) {
+            checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
+            return;
+        }
+
         checkAccessTokenAndAuthentication(request, response, filterChain);
     }
 
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
         userRepository.findByRefreshToken(refreshToken)
                 .ifPresent(user -> {
-                    String reIssuedAccessToken = jwtService.createAccessToken(user.getEmail());
-                    jwtService.sendAccessToken(response, reIssuedAccessToken);
+                    String reIssuedRefreshToken = reIssueRefreshToken(user);
+                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail(), user.getId()),
+                            reIssuedRefreshToken);
                 });
     }
-    
+
+    private String reIssueRefreshToken(User user) {
+        String reIssuedRefreshToken = jwtService.createRefreshToken();
+        user.updateRefreshToken(reIssuedRefreshToken);
+        userRepository.saveAndFlush(user);
+        return reIssuedRefreshToken;
+    }
+
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
         log.info("checkAccessTokenAndAuthentication() 호출");
         jwtService.extractAccessToken(request)
-                .filter(jwtService::isTokenValid)
-                .flatMap(jwtService::extractEmail)
-                .flatMap(userRepository::findByEmail)
-                .ifPresent(this::saveAuthentication);
+                .ifPresent(accessToken -> {
+                    String email = jwtService.verifyTokenAndGetEmail(accessToken);
+                    userRepository.findByEmail(email)
+                            .ifPresent(this::saveAuthentication);
+                });
 
         filterChain.doFilter(request, response);
     }
 
-    public void saveAuthentication(User myUser) {
+    public void saveAuthentication(User user) {
+        CustomUserDetails userDetailsUser = new CustomUserDetails(
+                Collections.singleton(new SimpleGrantedAuthority(user.getRoleType().getKey())),
+                user.getEmail(),
+                user.getRoleType(),
+                user.getId());
+
         Authentication authentication =
-                new UsernamePasswordAuthenticationToken(myUser, null, authoritiesMapper.mapAuthorities(myUser.getAuthorities()));
+                new UsernamePasswordAuthenticationToken(userDetailsUser, null,
+                        authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }
-
