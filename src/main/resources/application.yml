@@ -50,3 +50,11 @@ springdoc:
 logging:
   level:
     com.likelion.artipick: info
+
+# Weather API 설정
+weather:
+  api:
+    base-url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
+    auth-key: ${WEATHER_API_KEY}
+    current-endpoint: /getUltraSrtNcst    # 실시간
+    forecast-endpoint: /getVilageFcst     # 예보
