@@ -55,6 +55,6 @@ logging:
 weather:
   api:
     base-url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
-    auth-key: ${WEATHER_API_KEY:mtm78l0XOBbYRcLG3beI32nndtDxFxgAFYwq7K0mQUfgFa3zXz747Df/PGcYupk3z64MczijjaLw/v+q2XRYhg==}
+    auth-key: ${WEATHER_API_KEY}
     current-endpoint: /getUltraSrtNcst    # 실시간
     forecast-endpoint: /getVilageFcst     # 예보

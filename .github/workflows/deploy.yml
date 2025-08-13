@@ -84,4 +84,5 @@ jobs:
               -e DB_NAME=${{ secrets.DB_NAME }} \
               -e S3_REGION=${{ secrets.S3_REGION }} \
               -e S3_BUCKETNAME=${{ secrets.S3_BUCKETNAME }} \
+              -e WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }} \
               ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
