@@ -2,6 +2,9 @@ package com.likelion.artipick.weather.util;
 
 import org.springframework.stereotype.Component;
 
+/*
+    코드값이 아닌 반환이 필요한 경우 사용 현재는 사용 x
+ */
 @Component
 public class WeatherCodeConverter {
 

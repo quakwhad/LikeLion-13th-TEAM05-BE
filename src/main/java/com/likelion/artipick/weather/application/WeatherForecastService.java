@@ -163,9 +163,9 @@ public class WeatherForecastService {
 
     private WeatherForecastInfo.DailyForecast buildDailyForecast(Map<String, String> weatherData, LocalDate date, boolean isCurrent, String region) {
         String temperature = weatherData.getOrDefault(isCurrent ? "T1H" : "TMP", "정보없음");
-        String skyCondition = weatherCodeConverter.convertSkyCode(weatherData.getOrDefault("SKY", "1"));
+        String skyCondition = weatherData.getOrDefault("SKY", "1");
         String precipitationProbability = isCurrent ? "정보없음" : weatherData.getOrDefault("POP", "0") + "%";
-        String precipitationType = weatherCodeConverter.convertPrecipitationType(weatherData.getOrDefault("PTY", "0"));
+        String precipitationType = weatherData.getOrDefault("PTY", "0");
         String precipitationAmount = formatPrecipitationAmount(weatherData.getOrDefault(isCurrent ? "RN1" : "PCP", "0"));
 
         return new WeatherForecastInfo.DailyForecast(
