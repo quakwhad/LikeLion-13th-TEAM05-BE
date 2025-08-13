@@ -1,5 +1,6 @@
 package com.likelion.artipick.post.domain;
 
+import com.likelion.artipick.place.domain.Place;
 import com.likelion.artipick.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 
 // 게시글 정보를 담는 엔티티
 // 데이터베이스의 'posts' 테이블과 연결
-@Table(name = "posts")
+@Table(name = "post")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,15 +33,6 @@ public class Post {
     // 종료일
     @Column(name = "end_date")
     private String endDate;
-
-    // 장소
-    private String place;
-
-    // 지역
-    private String area;
-
-    // 시, 군, 구
-    private String sigungu;
 
     // 가격
     private String price;
@@ -64,10 +56,6 @@ public class Post {
 
     // 관련 URL
     private String url;
-
-    // 장소 상세 주소
-    @Column(name = "place_addr")
-    private String placeAddr;
 
     // 카테고리 Id
     @Column(name = "category_id")
@@ -110,14 +98,16 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
+    // 하나의 장소에 여러 게시글이 속할 수 있음 (ManyToOne)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "place_id")
+    private Place place;
+
     @Builder
-    public Post(String title, String startDate, String endDate, String place, String area, String sigungu, String price, String content, String phone, String imgUrl, String placeUrl, String seq, String url, String placeAddr, Long categoryId, String gpsX, String gpsY, LocalDateTime createdAt, LocalDateTime updatedAt, String status, Integer viewCount, Integer likeCount, Integer commentCount, User user) {
+    public Post(String title, String startDate, String endDate, String price, String content, String phone, String imgUrl, String placeUrl, String seq, String url, Long categoryId, String gpsX, String gpsY, LocalDateTime createdAt, LocalDateTime updatedAt, String status, Integer viewCount, Integer likeCount, Integer commentCount, User user, Place place) {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.place = place;
-        this.area = area;
-        this.sigungu = sigungu;
         this.price = price;
         this.content = content;
         this.phone = phone;
@@ -125,7 +115,6 @@ public class Post {
         this.placeUrl = placeUrl;
         this.seq = seq;
         this.url = url;
-        this.placeAddr = placeAddr;
         this.categoryId = categoryId;
         this.gpsX = gpsX;
         this.gpsY = gpsY;
@@ -136,5 +125,6 @@ public class Post {
         this.likeCount = likeCount;
         this.commentCount = commentCount;
         this.user = user;
+        this.place = place;
     }
 }
