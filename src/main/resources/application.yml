@@ -29,7 +29,7 @@ spring:
     open-in-view: false
 
 jwt:
-  secretKey: ${JWT_SECRET_KEY:0dgUoikj5+FpGCR9lEdTnjlZdIxODxYUCvmIbRObpoz45sFW84ZMfmGgX0jYIPS+LoNV83HcGcSMkcZ6u8tozg==}
+  secretKey: ${JWT_SECRET_KEY:d0be9e9ac7695e2f96c855f8c361f75ff6cf2a7b4f3988cd122f696f0fa5bdb9}
   access:
     expiration: ${JWT_ACCESS_EXPIRATION:3600000}
     header: ${JWT_ACCESS_HEADER:Authorization}
@@ -50,3 +50,11 @@ springdoc:
 logging:
   level:
     com.likelion.artipick: info
+
+# Weather API 설정
+weather:
+  api:
+    base-url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
+    auth-key: ${WEATHER_API_KEY:mtm78l0XOBbYRcLG3beI32nndtDxFxgAFYwq7K0mQUfgFa3zXz747Df/PGcYupk3z64MczijjaLw/v+q2XRYhg==}
+    current-endpoint: /getUltraSrtNcst    # 실시간
+    forecast-endpoint: /getVilageFcst     # 예보

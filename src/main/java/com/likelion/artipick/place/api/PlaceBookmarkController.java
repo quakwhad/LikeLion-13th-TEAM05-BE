@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "장소 북마크 API", description = "관심 장소 북마크/취소")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/places")
+@RequestMapping("/api/places")
 public class PlaceBookmarkController {
 
     private final PlaceBookmarkService placeBookmarkService;

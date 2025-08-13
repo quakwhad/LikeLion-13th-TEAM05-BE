@@ -6,6 +6,7 @@ import com.likelion.artipick.global.exception.GeneralException;
 import com.likelion.artipick.like.domain.repository.LikeRepository;
 import com.likelion.artipick.mypage.api.dto.MyPagePlaceDto;
 import com.likelion.artipick.mypage.api.dto.MyPagePostDto;
+import com.likelion.artipick.mypage.api.dto.MyPageUserDto;
 import com.likelion.artipick.mypage.api.dto.ProfileUpdateDto;
 import com.likelion.artipick.place.domain.repository.PlaceBookmarkRepository;
 import com.likelion.artipick.user.domain.User;
@@ -23,6 +24,13 @@ public class MyPageService {
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final PlaceBookmarkRepository placeBookmarkRepository;
+
+    @Transactional(readOnly = true)
+    public MyPageUserDto getMyPageInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        return MyPageUserDto.from(user);
+    }
 
     @Transactional(readOnly = true)
     public Page<MyPagePostDto> getLikedPosts(Long userId, Pageable pageable) {

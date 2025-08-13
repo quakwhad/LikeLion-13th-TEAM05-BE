@@ -1,10 +1,16 @@
 package com.likelion.artipick.post.domain.repository;
 
 import com.likelion.artipick.post.domain.Post;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
-public interface PostRepository extends JpaRepository<Post, Long> {
-    Page<Post> findByUserId(Long userId, Pageable pageable);
+import java.util.List;
+
+public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
+    @Query("SELECT DISTINCT p.area FROM Post p WHERE p.area IS NOT NULL")
+    List<String> findDistinctArea();
+
+    @Query("SELECT DISTINCT p.categoryId FROM Post p WHERE p.categoryId IS NOT NULL")
+    List<Long> findDistinctCategoryId();
 }
