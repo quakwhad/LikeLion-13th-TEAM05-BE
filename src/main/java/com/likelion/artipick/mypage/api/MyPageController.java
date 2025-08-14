@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,37 +26,37 @@ public class MyPageController {
 
     @Operation(summary = "내 정보 조회")
     @GetMapping
-    public ApiResponse<MyPageUserDto> getMyPageInfo(
+    public ResponseEntity<ApiResponse<MyPageUserDto>> getMyPageInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         MyPageUserDto myPageInfo = myPageService.getMyPageInfo(userDetails.getUserId());
-        return ApiResponse.onSuccess(myPageInfo);
+        return ResponseEntity.ok(ApiResponse.onSuccess(myPageInfo));
     }
 
     @Operation(summary = "내 정보 수정")
     @PatchMapping
-    public ApiResponse<Void> updateMyProfile(
+    public ResponseEntity<ApiResponse<Void>> updateMyProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody ProfileUpdateDto profileUpdateDto) {
         myPageService.updateProfile(userDetails.getUserId(), profileUpdateDto);
-        return ApiResponse.onSuccess(null);
+        return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
     @Operation(summary = "내가 찜한 게시글 목록 조회")
     @GetMapping("/likes")
-    public ApiResponse<Page<MyPagePostDto>> getMyLikedPosts(
+    public ResponseEntity<ApiResponse<Page<MyPagePostDto>>> getMyLikedPosts(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Pageable pageable) {
         Page<MyPagePostDto> likedPosts = myPageService.getLikedPosts(userDetails.getUserId(), pageable);
-        return ApiResponse.onSuccess(likedPosts);
+        return ResponseEntity.ok(ApiResponse.onSuccess(likedPosts));
     }
 
     @Operation(summary = "내가 북마크한 장소 목록 조회")
     @GetMapping("/location")
-    public ApiResponse<Page<MyPagePlaceDto>> getMyBookmarkedPlaces(
+    public ResponseEntity<ApiResponse<Page<MyPagePlaceDto>>> getMyBookmarkedPlaces(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Pageable pageable) {
         Page<MyPagePlaceDto> bookmarkedPlaces = myPageService.getBookmarkedPlaces(userDetails.getUserId(), pageable);
-        return ApiResponse.onSuccess(bookmarkedPlaces);
+        return ResponseEntity.ok(ApiResponse.onSuccess(bookmarkedPlaces));
     }
 }
 
