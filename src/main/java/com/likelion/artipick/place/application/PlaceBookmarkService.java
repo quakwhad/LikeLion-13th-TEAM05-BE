@@ -4,7 +4,7 @@ import com.likelion.artipick.global.code.status.ErrorStatus;
 import com.likelion.artipick.global.exception.GeneralException;
 import com.likelion.artipick.place.domain.Place;
 import com.likelion.artipick.place.domain.PlaceBookmark;
-import com.likelion.artipick.place.api.dto.PlaceBookmarkResponseDto;
+import com.likelion.artipick.place.api.dto.response.PlaceBookmarkResponseDto;
 import com.likelion.artipick.place.domain.repository.PlaceBookmarkRepository;
 import com.likelion.artipick.place.domain.repository.PlaceRepository;
 import com.likelion.artipick.user.domain.User;

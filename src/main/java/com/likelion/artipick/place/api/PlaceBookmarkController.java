@@ -2,7 +2,7 @@ package com.likelion.artipick.place.api;
 
 import com.likelion.artipick.global.code.dto.ApiResponse;
 import com.likelion.artipick.global.security.CustomUserDetails;
-import com.likelion.artipick.place.api.dto.PlaceBookmarkResponseDto;
+import com.likelion.artipick.place.api.dto.response.PlaceBookmarkResponseDto;
 import com.likelion.artipick.place.application.PlaceBookmarkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

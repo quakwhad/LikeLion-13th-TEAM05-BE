@@ -2,10 +2,10 @@ package com.likelion.artipick.mypage.api;
 
 import com.likelion.artipick.global.code.dto.ApiResponse;
 import com.likelion.artipick.global.security.CustomUserDetails;
-import com.likelion.artipick.mypage.api.dto.MyPagePlaceDto;
-import com.likelion.artipick.mypage.api.dto.MyPagePostDto;
-import com.likelion.artipick.mypage.api.dto.MyPageUserDto;
-import com.likelion.artipick.mypage.api.dto.ProfileUpdateDto;
+import com.likelion.artipick.mypage.api.dto.response.MyPagePlaceResponseDto;
+import com.likelion.artipick.mypage.api.dto.response.MyPagePostResponseDto;
+import com.likelion.artipick.mypage.api.dto.response.MyPageUserResponseDto;
+import com.likelion.artipick.mypage.api.dto.request.ProfileUpdateRequestDto;
 import com.likelion.artipick.mypage.application.MyPageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,9 +26,9 @@ public class MyPageController {
 
     @Operation(summary = "내 정보 조회")
     @GetMapping
-    public ResponseEntity<ApiResponse<MyPageUserDto>> getMyPageInfo(
+    public ResponseEntity<ApiResponse<MyPageUserResponseDto>> getMyPageInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        MyPageUserDto myPageInfo = myPageService.getMyPageInfo(userDetails.getUserId());
+        MyPageUserResponseDto myPageInfo = myPageService.getMyPageInfo(userDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.onSuccess(myPageInfo));
     }
 
@@ -36,26 +36,26 @@ public class MyPageController {
     @PatchMapping
     public ResponseEntity<ApiResponse<Void>> updateMyProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody ProfileUpdateDto profileUpdateDto) {
-        myPageService.updateProfile(userDetails.getUserId(), profileUpdateDto);
+            @RequestBody ProfileUpdateRequestDto profileUpdateRequestDto) {
+        myPageService.updateProfile(userDetails.getUserId(), profileUpdateRequestDto);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
     @Operation(summary = "내가 찜한 게시글 목록 조회")
     @GetMapping("/likes")
-    public ResponseEntity<ApiResponse<Page<MyPagePostDto>>> getMyLikedPosts(
+    public ResponseEntity<ApiResponse<Page<MyPagePostResponseDto>>> getMyLikedPosts(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Pageable pageable) {
-        Page<MyPagePostDto> likedPosts = myPageService.getLikedPosts(userDetails.getUserId(), pageable);
+        Page<MyPagePostResponseDto> likedPosts = myPageService.getLikedPosts(userDetails.getUserId(), pageable);
         return ResponseEntity.ok(ApiResponse.onSuccess(likedPosts));
     }
 
     @Operation(summary = "내가 북마크한 장소 목록 조회")
     @GetMapping("/location")
-    public ResponseEntity<ApiResponse<Page<MyPagePlaceDto>>> getMyBookmarkedPlaces(
+    public ResponseEntity<ApiResponse<Page<MyPagePlaceResponseDto>>> getMyBookmarkedPlaces(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Pageable pageable) {
-        Page<MyPagePlaceDto> bookmarkedPlaces = myPageService.getBookmarkedPlaces(userDetails.getUserId(), pageable);
+        Page<MyPagePlaceResponseDto> bookmarkedPlaces = myPageService.getBookmarkedPlaces(userDetails.getUserId(), pageable);
         return ResponseEntity.ok(ApiResponse.onSuccess(bookmarkedPlaces));
     }
 }

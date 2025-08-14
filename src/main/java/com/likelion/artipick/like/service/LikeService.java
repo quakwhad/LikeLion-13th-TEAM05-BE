@@ -3,7 +3,7 @@ package com.likelion.artipick.like.service;
 import com.likelion.artipick.global.code.status.ErrorStatus;
 import com.likelion.artipick.global.exception.GeneralException;
 import com.likelion.artipick.like.domain.Like;
-import com.likelion.artipick.like.api.dto.LikeResponseDto;
+import com.likelion.artipick.like.api.dto.response.LikeResponseDto;
 import com.likelion.artipick.like.domain.repository.LikeRepository;
 import com.likelion.artipick.post.domain.Post;
 import com.likelion.artipick.post.domain.repository.PostRepository;
