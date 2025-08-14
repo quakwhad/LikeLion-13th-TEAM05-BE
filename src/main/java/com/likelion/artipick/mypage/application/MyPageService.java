@@ -1,0 +1,52 @@
+package com.likelion.artipick.mypage.application;
+
+import com.likelion.artipick.global.code.status.ErrorStatus;
+import com.likelion.artipick.global.exception.GeneralException;
+
+import com.likelion.artipick.like.domain.repository.LikeRepository;
+import com.likelion.artipick.mypage.api.dto.response.MyPagePlaceResponseDto;
+import com.likelion.artipick.mypage.api.dto.response.MyPagePostResponseDto;
+import com.likelion.artipick.mypage.api.dto.response.MyPageUserResponseDto;
+import com.likelion.artipick.mypage.api.dto.request.ProfileUpdateRequestDto;
+import com.likelion.artipick.place.domain.repository.PlaceBookmarkRepository;
+import com.likelion.artipick.user.domain.User;
+import com.likelion.artipick.user.domain.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class MyPageService {
+
+    private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
+    private final PlaceBookmarkRepository placeBookmarkRepository;
+
+    public MyPageUserResponseDto getMyPageInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        return MyPageUserResponseDto.from(user);
+    }
+
+
+    public Page<MyPagePostResponseDto> getLikedPosts(Long userId, Pageable pageable) {
+        return likeRepository.findLikedPostsByUserId(userId, pageable)
+                .map(MyPagePostResponseDto::from);
+    }
+
+    public Page<MyPagePlaceResponseDto> getBookmarkedPlaces(Long userId, Pageable pageable) {
+        return placeBookmarkRepository.findBookmarkedPlacesByUserId(userId, pageable)
+                .map(MyPagePlaceResponseDto::from);
+    }
+
+    @Transactional
+    public void updateProfile(Long userId, ProfileUpdateRequestDto profileUpdateRequestDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        user.updateProfile(profileUpdateRequestDto.nickname(), profileUpdateRequestDto.introduction());
+    }
+}

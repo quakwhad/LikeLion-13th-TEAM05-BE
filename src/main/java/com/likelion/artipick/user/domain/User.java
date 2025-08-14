@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +25,9 @@ public class User extends BaseEntity {
 
     @Column(name = "nickname")
     private String nickname;
+
+    @Column(name = "introduction")
+    private String introduction;
 
     @Column(name = "profile_image_url")
     private String profileImageUrl;
@@ -48,10 +50,10 @@ public class User extends BaseEntity {
     private LocalDateTime lastLoginAt;
 
     @Builder
-    public User(String email, String nickname, String profileImageUrl, RoleType roleType,
-                SocialProvider socialProvider, String oauthId, LocalDateTime lastLoginAt) {
+    public User(String email, String nickname, String introduction, String profileImageUrl, RoleType roleType, SocialProvider socialProvider, String oauthId, LocalDateTime lastLoginAt) {
         this.email = email;
         this.nickname = nickname;
+        this.introduction = introduction;
         this.profileImageUrl = profileImageUrl;
         this.roleType = roleType;
         this.socialProvider = socialProvider;
@@ -65,6 +67,19 @@ public class User extends BaseEntity {
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void updateIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public void updateProfile(String nickname, String introduction) {
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+        if (introduction != null) {
+            this.introduction = introduction;
+        }
     }
 
     public void updateProfileImage(String profileImageUrl) {
