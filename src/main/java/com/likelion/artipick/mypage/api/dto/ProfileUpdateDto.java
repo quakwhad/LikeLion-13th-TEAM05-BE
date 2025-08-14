@@ -3,6 +3,7 @@ package com.likelion.artipick.mypage.api.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
+@Schema(description = "프로필 수정 요청 DTO")
 @Getter
 public class ProfileUpdateDto {
     @Schema(description = "닉네임", example = "새로운 닉네임")

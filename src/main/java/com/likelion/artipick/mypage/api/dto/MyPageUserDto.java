@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+@Schema(description = "마이페이지에서 유저 정보 조회 DTO")
 @Getter
 @Builder
 @AllArgsConstructor

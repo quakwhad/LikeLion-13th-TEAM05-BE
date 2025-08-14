@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+@Schema(description = "마이페이지에서 내가 쓰거나 찜한 게시글 목록 조회 DTO")
 @Getter
 @Builder
 @AllArgsConstructor

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+@Schema(description = "마이페이지에서 북마크(관심 지역 표시)한 장소 목록 조회 DTO")
 @Getter
 @Builder
 @AllArgsConstructor

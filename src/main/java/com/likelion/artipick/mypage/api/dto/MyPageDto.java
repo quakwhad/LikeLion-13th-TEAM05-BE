@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 
+@Schema(description = "마이페이지 전체 조회 응답 DTO")
 @Getter
 @Builder
 @AllArgsConstructor
