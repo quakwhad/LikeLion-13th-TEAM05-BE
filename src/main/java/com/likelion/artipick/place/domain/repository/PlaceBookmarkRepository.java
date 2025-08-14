@@ -14,6 +14,10 @@ import java.util.Optional;
 public interface PlaceBookmarkRepository extends JpaRepository<PlaceBookmark, Long> {
     Optional<PlaceBookmark> findByUserAndPlace(User user, Place place);
 
-    @Query("select b.place from PlaceBookmark b where b.user.id = :userId")
+    @Query("""
+    SELECT b.place
+    FROM PlaceBookmark b
+    WHERE b.user.id = :userId
+    """)
     Page<Place> findBookmarkedPlacesByUserId(@Param("userId") Long userId, Pageable pageable);
 }
