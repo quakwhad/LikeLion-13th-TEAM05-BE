@@ -1,5 +1,6 @@
 server:
   port: 8080
+  forward-headers-strategy: framework
 
 cloud:
   aws:
@@ -29,7 +30,7 @@ spring:
     open-in-view: false
 
 jwt:
-  secretKey: ${JWT_SECRET_KEY:d0be9e9ac7695e2f96c855f8c361f75ff6cf2a7b4f3988cd122f696f0fa5bdb9}
+  secretKey: ${JWT_SECRET_KEY}
   access:
     expiration: ${JWT_ACCESS_EXPIRATION:3600000}
     header: ${JWT_ACCESS_HEADER:Authorization}

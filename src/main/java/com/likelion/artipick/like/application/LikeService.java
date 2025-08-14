@@ -1,4 +1,4 @@
-package com.likelion.artipick.like.service;
+package com.likelion.artipick.like.application;
 
 import com.likelion.artipick.global.code.status.ErrorStatus;
 import com.likelion.artipick.global.exception.GeneralException;

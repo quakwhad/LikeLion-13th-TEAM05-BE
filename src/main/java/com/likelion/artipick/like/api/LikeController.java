@@ -3,7 +3,7 @@ package com.likelion.artipick.like.api;
 import com.likelion.artipick.global.code.dto.ApiResponse;
 import com.likelion.artipick.global.security.CustomUserDetails;
 import com.likelion.artipick.like.api.dto.response.LikeResponseDto;
-import com.likelion.artipick.like.service.LikeService;
+import com.likelion.artipick.like.application.LikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
