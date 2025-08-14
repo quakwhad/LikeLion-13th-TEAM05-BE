@@ -7,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.util.Collections;
 
 @RequiredArgsConstructor
-@Slf4j
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -67,6 +65,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
+
         jwtService.extractAccessToken(request)
                 .ifPresent(accessToken -> {
                     String email = jwtService.verifyTokenAndGetEmail(accessToken);
