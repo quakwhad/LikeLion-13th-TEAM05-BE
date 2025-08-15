@@ -59,3 +59,8 @@ weather:
     auth-key: ${WEATHER_API_KEY}
     current-endpoint: /getUltraSrtNcst    # 실시간
     forecast-endpoint: /getVilageFcst     # 예보
+
+# KaKao API 설정
+kakao:
+  api:
+    key: ${KAKAO_API_KEY}
