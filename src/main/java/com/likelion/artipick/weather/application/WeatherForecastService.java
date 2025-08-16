@@ -8,11 +8,11 @@ import com.likelion.artipick.weather.api.dto.response.WeatherDataItem;
 import com.likelion.artipick.weather.api.dto.response.WeatherForecastInfo;
 import com.likelion.artipick.weather.client.WeatherApiClient;
 import com.likelion.artipick.weather.util.CoordinateConverter;
-import com.likelion.artipick.weather.util.WeatherCodeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -29,37 +29,39 @@ public class WeatherForecastService {
 
     private final CoordinateConverter coordinateConverter;
     private final WeatherApiClient weatherApiClient;
-    private final WeatherCodeConverter weatherCodeConverter;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public WeatherForecastInfo getWeatherForecast(double longitude, double latitude) {
+    public Mono<WeatherForecastInfo> getWeatherForecast(double longitude, double latitude) {
         validateCoordinates(longitude, latitude);
-        CoordinateConverter.GridCoordinate grid = coordinateConverter.convertToGrid(longitude,
-                latitude);
+        CoordinateConverter.GridCoordinate grid = coordinateConverter.convertToGrid(longitude, latitude);
 
-        try {
-            String currentData = weatherApiClient.getCurrentWeather(grid.x(), grid.y());
-            String forecastData = weatherApiClient.getForecastWeather(grid.x(), grid.y());
+        // 두 API를 병렬로 호출 (성능 향상)
+        Mono<String> currentData = weatherApiClient.getCurrentWeather(grid.x(), grid.y());
+        Mono<String> forecastData = weatherApiClient.getForecastWeather(grid.x(), grid.y());
 
-            String region = String.format("경도:%.3f, 위도:%.3f", longitude, latitude);
-            List<WeatherForecastInfo.DailyForecast> forecasts = parseForecastData(currentData, forecastData, region);
+        String region = String.format("경도:%.3f, 위도:%.3f", longitude, latitude);
 
-            return new WeatherForecastInfo(forecasts);
-
-        } catch (Exception e) {
-            log.error("날씨 예보 조회 중 오류 발생", e);
-            throw e;
-        }
+        // Mono.zip으로 두 API 결과를 결합하여 병렬 처리
+        return Mono.zip(currentData, forecastData)
+                .map(tuple -> {
+                    String current = tuple.getT1();
+                    String forecast = tuple.getT2();
+                    List<WeatherForecastInfo.DailyForecast> forecasts =
+                            parseForecastData(current, forecast, region);
+                    return new WeatherForecastInfo(forecasts);
+                })
+                .doOnError(e -> log.error("날씨 예보 조회 중 오류 발생", e))
+                .onErrorMap(e -> new GeneralException(ErrorStatus.WEATHER_API_ERROR));
     }
 
-    public WeatherForecastInfo.DailyForecast getCurrentWeather(double longitude, double latitude) {
+    public Mono<WeatherForecastInfo.DailyForecast> getCurrentWeather(double longitude, double latitude) {
         validateCoordinates(longitude, latitude);
 
         CoordinateConverter.GridCoordinate grid = coordinateConverter.convertToGrid(longitude, latitude);
-        String currentData = weatherApiClient.getCurrentWeather(grid.x(), grid.y());
         String region = String.format("경도:%.3f, 위도:%.3f", longitude, latitude);
 
-        return parseCurrentWeather(currentData, LocalDate.now(), region);
+        return weatherApiClient.getCurrentWeather(grid.x(), grid.y())
+                .map(currentData -> parseCurrentWeather(currentData, LocalDate.now(), region));
     }
 
     private void validateCoordinates(double longitude, double latitude) {

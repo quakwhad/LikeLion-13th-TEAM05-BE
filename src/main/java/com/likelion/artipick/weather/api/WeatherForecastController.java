@@ -27,7 +27,10 @@ public class WeatherForecastController {
             @Parameter(description = "경도", example = "126.555") @RequestParam double longitude,
             @Parameter(description = "위도", example = "37.555") @RequestParam double latitude) {
 
-        WeatherForecastInfo forecast = weatherForecastService.getWeatherForecast(longitude, latitude);
+        WeatherForecastInfo forecast = weatherForecastService
+                .getWeatherForecast(longitude, latitude)
+                .block();  // 비동기 → 동기 변환
+
         return ResponseEntity.ok(ApiResponse.onSuccess(forecast));
     }
 
@@ -39,7 +42,10 @@ public class WeatherForecastController {
             @Parameter(description = "위도", example = "37.555")
             @RequestParam double latitude) {
 
-        WeatherForecastInfo.DailyForecast current = weatherForecastService.getCurrentWeather(longitude, latitude);
+        WeatherForecastInfo.DailyForecast current = weatherForecastService
+                .getCurrentWeather(longitude, latitude)
+                .block();  // 비동기 → 동기 변환
+
         return ResponseEntity.ok(ApiResponse.onSuccess(current));
     }
 }
