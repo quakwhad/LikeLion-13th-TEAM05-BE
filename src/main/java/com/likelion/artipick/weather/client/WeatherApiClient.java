@@ -5,7 +5,8 @@ import com.likelion.artipick.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -18,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class WeatherApiClient {
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
 
     @Value("${weather.api.base-url}")
     private String baseUrl;
@@ -32,7 +33,7 @@ public class WeatherApiClient {
     @Value("${weather.api.forecast-endpoint}")
     private String forecastEndpoint;
 
-    public String getCurrentWeather(int nx, int ny) {
+    public Mono<String> getCurrentWeather(int nx, int ny) {
         LocalDateTime now = LocalDateTime.now();
         int hour = now.getHour() - 1;
         LocalDate date = now.toLocalDate();
@@ -49,16 +50,14 @@ public class WeatherApiClient {
         String url = String.format("%s%s?ServiceKey=%s&pageNo=1&numOfRows=1000&dataType=JSON&base_date=%s&base_time=%s&nx=%d&ny=%d",
                 baseUrl, currentEndpoint, encodedKey, baseDate, baseTime, nx, ny);
 
-        URI uri = URI.create(url);
-
-        try {
-            return restTemplate.getForObject(uri, String.class);
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.WEATHER_API_ERROR);
-        }
+        return webClient.get()
+                .uri(URI.create(url))  // URI 객체로 변환하여 재인코딩 방지
+                .retrieve()
+                .bodyToMono(String.class)
+                .onErrorMap(e -> new GeneralException(ErrorStatus.WEATHER_API_ERROR));
     }
 
-    public String getForecastWeather(int nx, int ny) {
+    public Mono<String> getForecastWeather(int nx, int ny) {
         LocalDateTime now = LocalDateTime.now();
         String baseDate = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String baseTime = getForecastBaseTime(now);
@@ -67,13 +66,11 @@ public class WeatherApiClient {
         String url = String.format("%s%s?ServiceKey=%s&pageNo=1&numOfRows=1000&dataType=JSON&base_date=%s&base_time=%s&nx=%d&ny=%d",
                 baseUrl, forecastEndpoint, encodedKey, baseDate, baseTime, nx, ny);
 
-        URI uri = URI.create(url);
-
-        try {
-            return restTemplate.getForObject(uri, String.class);
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.WEATHER_API_ERROR);
-        }
+        return webClient.get()
+                .uri(URI.create(url))  // URI 객체로 변환하여 재인코딩 방지
+                .retrieve()
+                .bodyToMono(String.class)
+                .onErrorMap(e -> new GeneralException(ErrorStatus.WEATHER_API_ERROR));
     }
 
     private String getForecastBaseTime(LocalDateTime now) {

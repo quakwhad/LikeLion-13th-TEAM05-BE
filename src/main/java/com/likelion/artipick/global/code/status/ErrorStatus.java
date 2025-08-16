@@ -36,6 +36,8 @@ public enum ErrorStatus implements BaseErrorCode {
     ENDPOINT_NOT_FOUND(HttpStatus.NOT_FOUND, "GEN4043", "존재하지 않는 엔드포인트입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER4044", "사용자를 찾을 수 없습니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4045", "게시글을 찾을 수 없습니다."),
+    CHAT_RESPONSE_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT4046", "채팅 응답을 찾을 수 없습니다."),
+    LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "KAKAO4047", "해당 위치 정보를 찾을 수 없습니다."),
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "COMMON405", "허용되지 않는 HTTP 메서드입니다."),
@@ -52,8 +54,11 @@ public enum ErrorStatus implements BaseErrorCode {
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB5003", "데이터베이스 처리 중 오류가 발생했습니다."),
     WEATHER_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "WEATHER5004", "날씨 API 호출 중 오류가 발생했습니다."),
     WEATHER_FORECAST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "WEATHER5005", "날씨 예보 조회 중 오류가 발생했습니다."),
+    AI_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CHAT5006", "AI 서버 통신 오류가 발생했습니다."),
+    CHAT_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CHAT5007", "채팅 메시지 저장 중 오류가 발생했습니다."),
+    KAKAO_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO5008", "카카오 API 통신 오류가 발생했습니다."),
 
-    // 502, 502, 504
+    // 502, 503, 504
     BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "COMMON502", "불완전한 게이트웨이 응답을 받았습니다."),
     SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "COMMON503", "서비스를 일시적으로 사용할 수 없습니다."),
     GATEWAY_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "COMMON504", "게이트웨이 연결이 시간 초과되었습니다.");

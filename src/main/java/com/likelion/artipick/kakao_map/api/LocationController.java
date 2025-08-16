@@ -27,7 +27,7 @@ public class LocationController {
     public ResponseEntity<ApiResponse<AddressResponse>> getAddress(
             @Parameter(description = "경도", example = "126.978") @RequestParam double longitude,
             @Parameter(description = "위도", example = "37.566") @RequestParam double latitude) {
-        AddressResponse address = geocodingService.getAddressFromCoords(longitude, latitude);
+        AddressResponse address = geocodingService.getAddressFromCoords(longitude, latitude).block();
         return ResponseEntity.ok(ApiResponse.onSuccess(address));
     }
 
@@ -35,7 +35,7 @@ public class LocationController {
     @GetMapping("/coordinates")
     public ApiResponse<CoordinatesResponse> getCoordinates(
             @Parameter(description = "주소", example = "서울특별시 구로구") @RequestParam String address) {
-        CoordinatesResponse coordinates = geocodingService.getCoordsFromAddress(address);
+        CoordinatesResponse coordinates = geocodingService.getCoordsFromAddress(address).block();
         return ApiResponse.onSuccess(coordinates);
     }
 }
