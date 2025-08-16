@@ -4,6 +4,7 @@ import com.likelion.artipick.kakao_map.api.dto.response.AddressResponse;
 import com.likelion.artipick.kakao_map.api.dto.response.CoordinatesResponse;
 import com.likelion.artipick.kakao_map.api.dto.response.KakaoAddressResponse;
 import com.likelion.artipick.kakao_map.api.dto.response.KakaoCoordResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,16 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@RequiredArgsConstructor
 public class KakaoGeocodingService {
 
     @Value("${kakao.api.key}")
     private String apiKey;
 
     private final RestTemplate restTemplate;
-
-    public KakaoGeocodingService() {
-        this.restTemplate = new RestTemplate();
-    }
 
     public AddressResponse getAddressFromCoords(double longitude, double latitude) {
         String url = String.format("https://dapi.kakao.com/v2/local/geo/coord2address.json?x=%f&y=%f", longitude, latitude);

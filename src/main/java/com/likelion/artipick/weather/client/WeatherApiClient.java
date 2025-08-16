@@ -2,6 +2,7 @@ package com.likelion.artipick.weather.client;
 
 import com.likelion.artipick.global.code.status.ErrorStatus;
 import com.likelion.artipick.global.exception.GeneralException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Component
+@RequiredArgsConstructor
 public class WeatherApiClient {
 
     private final RestTemplate restTemplate;
@@ -29,10 +31,6 @@ public class WeatherApiClient {
 
     @Value("${weather.api.forecast-endpoint}")
     private String forecastEndpoint;
-
-    public WeatherApiClient() {
-        this.restTemplate = new RestTemplate();
-    }
 
     public String getCurrentWeather(int nx, int ny) {
         LocalDateTime now = LocalDateTime.now();
