@@ -86,4 +86,5 @@ jobs:
               -e S3_BUCKETNAME=${{ secrets.S3_BUCKETNAME }} \
               -e WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }} \
               -e KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }} \
+              -e AI_SERVER_URL=${{ secrets.AI_SERVER_URL }} \
               ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
