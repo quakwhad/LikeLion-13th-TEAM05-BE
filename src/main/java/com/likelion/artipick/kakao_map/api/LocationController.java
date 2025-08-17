@@ -33,9 +33,9 @@ public class LocationController {
 
     @Operation(summary = "주소를 좌표로 변환", description = "지역명을 경도, 위도로 변환합니다.")
     @GetMapping("/coordinates")
-    public ApiResponse<CoordinatesResponse> getCoordinates(
+    public ResponseEntity<ApiResponse<CoordinatesResponse>> getCoordinates(
             @Parameter(description = "주소", example = "서울특별시 구로구") @RequestParam String address) {
         CoordinatesResponse coordinates = geocodingService.getCoordsFromAddress(address).block();
-        return ApiResponse.onSuccess(coordinates);
+        return ResponseEntity.ok(ApiResponse.onSuccess(coordinates));
     }
 }
