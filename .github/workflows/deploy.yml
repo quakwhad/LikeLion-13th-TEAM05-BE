@@ -87,4 +87,5 @@ jobs:
               -e WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }} \
               -e KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }} \
               -e AI_SERVER_URL=${{ secrets.AI_SERVER_URL }} \
+              -e CULTURE_API_KEY=${{ secrets.CULTURE_API_KEY }} \
               ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}

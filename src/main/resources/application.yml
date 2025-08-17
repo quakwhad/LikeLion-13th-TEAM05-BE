@@ -20,6 +20,12 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:1234}
 
+    hikari:
+      maximum-pool-size: 30        # 연결 풀 크기 증가
+      minimum-idle: 10             # 최소 idle 연결 수
+      connection-timeout: 20000    # 연결 타임아웃 20초
+      leak-detection-threshold: 60000  # 연결 누수 감지
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -68,4 +74,10 @@ kakao:
 # AI 서버 설정
 ai:
   server:
-    url: ${AI_SERVER_URL} # 수정 필요
+    url: ${AI_SERVER_URL:http://localhost:9999} # 수정 필요
+
+# 문화 예술 정보 API
+culture:
+  api:
+    base-url: https://apis.data.go.kr/B553457/cultureinfo
+    auth-key: ${CULTURE_API_KEY}
