@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
-    @Query("SELECT DISTINCT p.categoryId FROM Post p WHERE p.categoryId IS NOT NULL")
-    List<Long> findDistinctCategoryId();
+    @Query("SELECT DISTINCT p.category.id FROM Post p WHERE p.category IS NOT NULL")
+    List<Long> findDistinctCategoryIds();
 }

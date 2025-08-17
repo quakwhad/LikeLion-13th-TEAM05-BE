@@ -11,11 +11,15 @@ import com.likelion.artipick.mypage.api.dto.request.ProfileUpdateRequestDto;
 import com.likelion.artipick.place.domain.repository.PlaceBookmarkRepository;
 import com.likelion.artipick.user.domain.User;
 import com.likelion.artipick.user.domain.repository.UserRepository;
+import com.likelion.artipick.interestcategory.domain.repository.InterestCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +29,18 @@ public class MyPageService {
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final PlaceBookmarkRepository placeBookmarkRepository;
+    private final InterestCategoryRepository interestCategoryRepository;
 
     public MyPageUserResponseDto getMyPageInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-        return MyPageUserResponseDto.from(user);
+
+        List<String> interestedCategories = interestCategoryRepository.findByUserId(userId)
+                .stream()
+                .map(interestCategory -> interestCategory.getCategory().getName())
+                .collect(Collectors.toList());
+
+        return MyPageUserResponseDto.from(user, interestedCategories);
     }
 
 
