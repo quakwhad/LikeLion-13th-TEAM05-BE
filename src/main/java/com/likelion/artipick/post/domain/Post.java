@@ -1,6 +1,5 @@
 package com.likelion.artipick.post.domain;
 
-import com.likelion.artipick.category.domain.Category;
 import com.likelion.artipick.place.domain.Place;
 import com.likelion.artipick.user.domain.User;
 import jakarta.persistence.*;
@@ -58,11 +57,6 @@ public class Post {
     // 관련 URL
     private String url;
 
-    // 카테고리 Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id") // DB의 'category_id' 컬럼과 매핑됨
-    private Category category; // ✨ Category 객체를 직접 참조
-
     // 경도
     @Column(name = "gps_x")
     private String gpsX;
@@ -106,7 +100,7 @@ public class Post {
     private Place place;
 
     @Builder
-    public Post(String title, String startDate, String endDate, String price, String content, String phone, String imgUrl, String placeUrl, String seq, String url, Category category, String gpsX, String gpsY, LocalDateTime createdAt, LocalDateTime updatedAt, String status, Integer viewCount, Integer likeCount, Integer commentCount, User user, Place place) {
+    public Post(String title, String startDate, String endDate, String price, String content, String phone, String imgUrl, String placeUrl, String seq, String url, String gpsX, String gpsY, LocalDateTime createdAt, LocalDateTime updatedAt, String status, Integer viewCount, Integer likeCount, Integer commentCount, User user, Place place) {
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -117,7 +111,6 @@ public class Post {
         this.placeUrl = placeUrl;
         this.seq = seq;
         this.url = url;
-        this.category = category;
         this.gpsX = gpsX;
         this.gpsY = gpsY;
         this.createdAt = createdAt;
