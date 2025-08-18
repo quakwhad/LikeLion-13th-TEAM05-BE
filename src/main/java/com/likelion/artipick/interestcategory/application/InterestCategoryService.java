@@ -26,14 +26,14 @@ public class InterestCategoryService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
-    public void updateInterestCategories(Long userId, InterestCategoryRequestDto requestDto) {
+    public List<String> updateInterestCategories(Long userId, InterestCategoryRequestDto requestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // Get current interested categories for the user
         List<InterestCategory> currentInterestCategories = interestCategoryRepository.findByUserId(userId);
         Set<String> currentCategoryNames = currentInterestCategories.stream()
-                .map(ic -> ic.getCategory().getName())
+                .map(ic -> ic.getCategory().getName().getDisplayName())
                 .collect(Collectors.toSet());
 
         // Get new interested category names from the request
@@ -65,5 +65,7 @@ public class InterestCategoryService {
                     .build();
             interestCategoryRepository.save(interestCategory);
         }
+
+        return newCategoryNames.stream().toList();
     }
 }

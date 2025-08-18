@@ -15,8 +15,8 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "user_interest_categories") // Keep table name for now, can be changed later if needed
-public class InterestCategory extends BaseEntity { // Renamed class
+@Table(name = "interest_categories")
+public class InterestCategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

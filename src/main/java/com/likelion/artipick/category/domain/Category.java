@@ -19,14 +19,15 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "category_name", nullable = false, unique = true)
-    private String name;
+    private CategoryList name; // 타입 변경
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
 
     @Builder
-    public Category(String name) {
+    public Category(CategoryList name) { // 생성자 타입 변경
         this.name = name;
     }
 }

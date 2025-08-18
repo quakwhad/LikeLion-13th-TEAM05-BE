@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "관심 카테고리 API", description = "관심 카테고리 설정 관련 API")
 @RestController
 @RequiredArgsConstructor
@@ -19,12 +21,12 @@ public class InterestCategoryController {
 
     private final InterestCategoryService interestCategoryService;
 
-    @Operation(summary = "관심 카테고리 설정/업데이트")
+    @Operation(summary = "관심 카테고리 업데이트")
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> updateInterestCategories(
+    public ResponseEntity<ApiResponse<List<String>>> updateInterestCategories(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody InterestCategoryRequestDto requestDto) {
-        interestCategoryService.updateInterestCategories(userDetails.getUserId(), requestDto);
-        return ResponseEntity.ok(ApiResponse.onSuccess(null));
+        List<String> updatedCategories = interestCategoryService.updateInterestCategories(userDetails.getUserId(), requestDto);
+        return ResponseEntity.ok(ApiResponse.onSuccess(updatedCategories));
     }
 }

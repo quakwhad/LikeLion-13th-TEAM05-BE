@@ -37,7 +37,7 @@ public class MyPageService {
 
         List<String> interestedCategories = interestCategoryRepository.findByUserId(userId)
                 .stream()
-                .map(interestCategory -> interestCategory.getCategory().getName())
+                .map(interestCategory -> interestCategory.getCategory().getName().getDisplayName())
                 .collect(Collectors.toList());
 
         return MyPageUserResponseDto.from(user, interestedCategories);
