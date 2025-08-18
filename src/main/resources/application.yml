@@ -20,6 +20,12 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:1234}
 
+    hikari:
+      maximum-pool-size: 30        # 연결 풀 크기 증가
+      minimum-idle: 10             # 최소 idle 연결 수
+      connection-timeout: 20000    # 연결 타임아웃 20초
+      leak-detection-threshold: 60000  # 연결 누수 감지
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -30,7 +36,7 @@ spring:
     open-in-view: false
 
 jwt:
-  secretKey: ${JWT_SECRET_KEY}
+  secretKey: ${JWT_SECRET_KEY:d0be9e9ac7695e2f96c855f8c361f75ff6cf2a7b4f3988cd122f696f0fa5bdb9}
   access:
     expiration: ${JWT_ACCESS_EXPIRATION:3600000}
     header: ${JWT_ACCESS_HEADER:Authorization}
@@ -56,11 +62,22 @@ logging:
 weather:
   api:
     base-url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
-    auth-key: ${WEATHER_API_KEY}
+    auth-key: ${WEATHER_API_KEY:mtm78l0XOBbYRcLG3beI32nndtDxFxgAFYwq7K0mQUfgFa3zXz747Df/PGcYupk3z64MczijjaLw/v+q2XRYhg==}
     current-endpoint: /getUltraSrtNcst    # 실시간
     forecast-endpoint: /getVilageFcst     # 예보
 
 # KaKao API 설정
 kakao:
   api:
-    key: ${KAKAO_API_KEY}
+    key: ${KAKAO_API_KEY:b16072cf53f1b5a644c7de639c0bdd38}
+
+# AI 서버 설정
+ai:
+  server:
+    url: ${AI_SERVER_URL:http://localhost:9999} # 수정 필요
+
+# 문화 예술 정보 API
+culture:
+  api:
+    base-url: https://apis.data.go.kr/B553457/cultureinfo
+    auth-key: ${CULTURE_API_KEY:mtm78l0XOBbYRcLG3beI32nndtDxFxgAFYwq7K0mQUfgFa3zXz747Df/PGcYupk3z64MczijjaLw/v+q2XRYhg==}

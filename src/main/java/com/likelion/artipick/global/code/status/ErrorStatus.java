@@ -18,6 +18,7 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_LATITUDE(HttpStatus.BAD_REQUEST, "WEATHER4005", "유효하지 않은 위도값입니다."),
     INVALID_LONGITUDE(HttpStatus.BAD_REQUEST, "WEATHER4006", "유효하지 않은 경도값입니다."),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "WEATHER4007", "날짜 형식이 올바르지 않습니다."),
+    CULTURE_API_EMPTY_RESPONSE(HttpStatus.BAD_GATEWAY, "CULTURE4008", "문화행사 API에서 빈 응답을 받았습니다."),
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH401", "인증이 필요합니다."),
@@ -58,6 +59,7 @@ public enum ErrorStatus implements BaseErrorCode {
     AI_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CHAT5006", "AI 서버 통신 오류가 발생했습니다."),
     CHAT_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CHAT5007", "채팅 메시지 저장 중 오류가 발생했습니다."),
     KAKAO_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "KAKAO5008", "카카오 API 통신 오류가 발생했습니다."),
+    CULTURE_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CULTURE5009", "문화 정보 API 통신 오류가 발생했습니다."),
 
     // 502, 503, 504
     BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "COMMON502", "불완전한 게이트웨이 응답을 받았습니다."),
