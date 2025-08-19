@@ -10,7 +10,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @Getter
 @Builder
-@DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "interest_categories")
