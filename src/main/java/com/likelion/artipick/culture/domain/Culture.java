@@ -74,6 +74,14 @@ public class Culture extends BaseAuditEntity {
     @Column(name = "is_from_api", nullable = false)
     private Boolean isFromApi = true;
 
+    @Column(name = "view_count", nullable = false)
+    private int viewCount = 0;
+
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

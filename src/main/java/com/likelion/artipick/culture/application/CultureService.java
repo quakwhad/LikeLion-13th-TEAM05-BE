@@ -1,12 +1,16 @@
 package com.likelion.artipick.culture.application;
 
+import com.likelion.artipick.culture.api.dto.request.CultureRequest;
 import com.likelion.artipick.culture.api.dto.response.CultureDetailApiResponse;
 import com.likelion.artipick.culture.client.CultureApiClient;
 import com.likelion.artipick.culture.domain.Category;
 import com.likelion.artipick.culture.domain.Culture;
+import com.likelion.artipick.culture.domain.CultureLike;
+import com.likelion.artipick.culture.domain.repository.CultureLikeRepository;
 import com.likelion.artipick.culture.domain.repository.CultureRepository;
 import com.likelion.artipick.global.code.status.ErrorStatus;
 import com.likelion.artipick.global.exception.GeneralException;
+import com.likelion.artipick.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -34,24 +38,27 @@ public class CultureService {
 
     private final CultureRepository cultureRepository;
     private final CultureApiClient cultureApiClient;
+    private final CultureLikeRepository likeRepository;
 
     @Transactional
     public Mono<Void> scheduledSync() {
         return Flux.range(1, 3)
-                .concatMap(page -> syncCultureEventsByPageReactive(page, 35)) // concatMap (순서 보장)
+                .concatMap(page -> syncCultureEventsByPageReactive(page, 35))
                 .then()
                 .doOnSuccess(unused -> log.info("전체 동기화 완료"))
                 .doOnError(error -> log.error("전체 동기화 실패", error));
     }
 
-
     public Page<Culture> findAllCultures(Pageable pageable) {
         return cultureRepository.findAll(pageable);
     }
 
+    @Transactional
     public Culture findCultureById(Long id) {
-        return cultureRepository.findById(id)
+        Culture culture = cultureRepository.findById(id)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.NOT_FOUND));
+        culture.increaseViewCount(); //조회수 증가
+        return culture;
     }
 
     private Mono<List<Culture>> syncCultureEventsByPageReactive(int page, int size) {
@@ -64,21 +71,21 @@ public class CultureService {
                 })
                 .flatMapMany(Flux::fromIterable)
                 .flatMap(seq ->
-                        Mono.fromCallable(() -> cultureRepository.existsBySeq(seq))
-                                .subscribeOn(Schedulers.boundedElastic())
-                                .map(exists -> exists ? null : seq)
-                                .onErrorResume(throwable -> {
-                                    log.debug("seq {} 존재 여부 확인 실패: {}", seq, throwable.getMessage());
-                                    return Mono.empty();
-                                })
-                , 3) // 동시 실행 개수 제한
+                                Mono.fromCallable(() -> cultureRepository.existsBySeq(seq))
+                                        .subscribeOn(Schedulers.boundedElastic())
+                                        .map(exists -> exists ? null : seq)
+                                        .onErrorResume(throwable -> {
+                                            log.debug("seq {} 존재 여부 확인 실패: {}", seq, throwable.getMessage());
+                                            return Mono.empty();
+                                        })
+                        , 3)
                 .filter(Objects::nonNull)
                 .flatMap(seq -> saveDetailData(seq)
-                        .onErrorResume(throwable -> {
-                            log.warn("seq {} 저장 실패, 스킵: {}", seq, throwable.getMessage());
-                            return Mono.empty();
-                        })
-                , 2) // 동시 실행 개수 제한
+                                .onErrorResume(throwable -> {
+                                    log.warn("seq {} 저장 실패, 스킵: {}", seq, throwable.getMessage());
+                                    return Mono.empty();
+                                })
+                        , 2)
                 .collectList()
                 .doOnNext(cultures ->
                         log.info("페이지 {} 동기화 완료: {} 건 성공", page, cultures.size())
@@ -153,5 +160,75 @@ public class CultureService {
                 .filter(category -> category.getDisplayName().equals(realmName))
                 .findFirst()
                 .orElse(Category.ETC);
+    }
+
+    // CRUD/찜 기능
+
+    @Transactional
+    public Culture createCulture(CultureRequest request, User user) {
+        Culture culture = Culture.builder()
+                .title(request.title())
+                .startDate(request.startDate())
+                .endDate(request.endDate())
+                .place(request.place())
+                .category(request.category())
+                .area(request.area())
+                .sigungu(request.sigungu())
+                .price(request.price())
+                .placeAddr(request.placeAddr())
+                .gpsX(request.gpsX())
+                .gpsY(request.gpsY())
+                .placeUrl(request.placeUrl())
+                .phone(request.phone())
+                .contents(request.contents())
+                .imgUrl(request.imgUrl())
+                .isFromApi(false)
+                .user(user)
+                .build();
+        return cultureRepository.save(culture);
+    }
+
+    @Transactional
+    public Culture updateCulture(Long id, CultureRequest request, User user) {
+        Culture culture = findCultureById(id);
+        if (!culture.getUser().equals(user)) {
+            throw new GeneralException(ErrorStatus.FORBIDDEN);
+        }
+        culture.updateCulture(
+                request.title(),
+                request.startDate(),
+                request.endDate(),
+                request.place(),
+                request.category(),
+                request.area(),
+                request.sigungu(),
+                request.price(),
+                request.placeAddr(),
+                request.gpsX(),
+                request.gpsY(),
+                request.placeUrl(),
+                request.phone(),
+                request.contents(),
+                request.imgUrl()
+        );
+        return culture;
+    }
+
+    @Transactional
+    public void deleteCulture(Long id, User user) {
+        Culture culture = findCultureById(id);
+        if (!culture.getUser().equals(user)) {
+            throw new GeneralException(ErrorStatus.FORBIDDEN);
+        }
+        cultureRepository.delete(culture);
+    }
+
+    @Transactional
+    public void toggleLike(Long cultureId, User user) {
+        Culture culture = findCultureById(cultureId);
+        CultureLike like = likeRepository.findByUserAndCulture(user, culture)
+                .orElse(new CultureLike(user, culture));
+        like.toggle();
+        likeRepository.save(like);
     }
 }
