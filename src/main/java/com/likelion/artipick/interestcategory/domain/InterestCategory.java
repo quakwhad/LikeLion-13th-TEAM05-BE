@@ -8,9 +8,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Table(name = "interest_categories")
 public class InterestCategory extends BaseEntity {
 
@@ -25,4 +23,12 @@ public class InterestCategory extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "category_name", nullable = false)
     private Category category; // Category Enum 타입 필드 추가
+
+    @Builder
+    public InterestCategory(Long id, User user, Category category) {
+        this.id = id;
+        this.user = user;
+        this.category = category;
+    }
 }
+
