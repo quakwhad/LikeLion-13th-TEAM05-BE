@@ -17,12 +17,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class InterestCategoryService {
 
     private final InterestCategoryRepository interestCategoryRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public List<String> updateInterestCategories(Long userId, InterestCategoryRequestDto requestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
