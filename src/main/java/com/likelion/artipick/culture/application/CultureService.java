@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -43,7 +44,7 @@ public class CultureService {
     @Transactional
     public Mono<Void> scheduledSync() {
         return Flux.range(1, 3)
-                .concatMap(page -> syncCultureEventsByPageReactive(page, 35))
+                .concatMap(page -> syncCultureEventsByPageReactive(page, 35))// concatMap (순서 보장)
                 .then()
                 .doOnSuccess(unused -> log.info("전체 동기화 완료"))
                 .doOnError(error -> log.error("전체 동기화 실패", error));
@@ -162,6 +163,12 @@ public class CultureService {
                 .orElse(Category.ETC);
     }
 
+    private void validateOwnership(Culture culture, User user) {
+        if (!culture.getUser().equals(user)) {
+            throw new GeneralException(ErrorStatus.FORBIDDEN);
+        }
+    }
+
     // CRUD/찜 기능
 
     @Transactional
@@ -191,9 +198,7 @@ public class CultureService {
     @Transactional
     public Culture updateCulture(Long id, CultureRequest request, User user) {
         Culture culture = findCultureById(id);
-        if (!culture.getUser().equals(user)) {
-            throw new GeneralException(ErrorStatus.FORBIDDEN);
-        }
+        validateOwnership(culture, user);
         culture.updateCulture(
                 request.title(),
                 request.startDate(),
@@ -217,9 +222,7 @@ public class CultureService {
     @Transactional
     public void deleteCulture(Long id, User user) {
         Culture culture = findCultureById(id);
-        if (!culture.getUser().equals(user)) {
-            throw new GeneralException(ErrorStatus.FORBIDDEN);
-        }
+        validateOwnership(culture, user);
         cultureRepository.delete(culture);
     }
 
@@ -231,4 +234,13 @@ public class CultureService {
         like.toggle();
         likeRepository.save(like);
     }
+
+    public Map<String, String> getLocation(Long cultureId) {
+        Culture culture = findCultureById(cultureId);
+        return Map.of(
+                "gpsX", culture.getGpsX(),
+                "gpsY", culture.getGpsY()
+        );
+    }
+
 }

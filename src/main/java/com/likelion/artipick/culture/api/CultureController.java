@@ -27,10 +27,11 @@ public class CultureController {
 
     private final CultureService cultureService;
 
-    @Operation(summary = "문화행사 목록 조회")
+    @Operation(summary = "문화행사 목록 조회", description = "문화행사 목록을 페이징하여 조회합니다.")
     @GetMapping
     public ResponseEntity<ApiResponse<Page<CultureListResponse>>> getCulture(
-            @Parameter(description = "페이지 정보") @PageableDefault(size = 20) Pageable pageable) {
+            @Parameter(description = "페이지 정보")
+            @PageableDefault(size = 20) Pageable pageable) {
 
         Page<CultureListResponse> cultures = cultureService.findAllCultures(pageable)
                 .map(CultureListResponse::from);
@@ -38,7 +39,7 @@ public class CultureController {
         return ResponseEntity.ok(ApiResponse.onSuccess(cultures));
     }
 
-    @Operation(summary = "문화행사 상세 조회")
+    @Operation(summary = "문화행사 상세 조회", description = "특정 문화행사의 상세 정보를 조회합니다.")
     @GetMapping("/{cultureId}")
     public ResponseEntity<ApiResponse<CultureResponse>> getCulture(
             @Parameter(description = "문화행사 ID", example = "1") @PathVariable Long cultureId) {
@@ -47,9 +48,7 @@ public class CultureController {
         return ResponseEntity.ok(ApiResponse.onSuccess(culture));
     }
 
-    // CRUD/찜/위치 API
-
-    @Operation(summary = "문화행사 생성")
+    @Operation(summary = "문화행사 생성", description = "새로운 문화행사를 등록합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<CultureResponse>> createCulture(
             @RequestBody CultureRequest request,
@@ -58,43 +57,38 @@ public class CultureController {
                 CultureResponse.from(cultureService.createCulture(request, user))));
     }
 
-    @Operation(summary = "문화행사 수정")
+    @Operation(summary = "문화행사 수정", description = "기존 문화행사를 수정합니다.")
     @PatchMapping("/{cultureId}")
     public ResponseEntity<ApiResponse<CultureResponse>> updateCulture(
-            @PathVariable Long cultureId,
+            @Parameter(description = "문화행사 ID", example = "1") @PathVariable Long cultureId,
             @RequestBody CultureRequest request,
             @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(ApiResponse.onSuccess(
                 CultureResponse.from(cultureService.updateCulture(cultureId, request, user))));
     }
 
-    @Operation(summary = "문화행사 삭제")
+    @Operation(summary = "문화행사 삭제", description = "특정 문화행사를 삭제합니다.")
     @DeleteMapping("/{cultureId}")
     public ResponseEntity<ApiResponse<Void>> deleteCulture(
-            @PathVariable Long cultureId,
+            @Parameter(description = "문화행사 ID", example = "1") @PathVariable Long cultureId,
             @AuthenticationPrincipal User user) {
         cultureService.deleteCulture(cultureId, user);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
-    @Operation(summary = "문화행사 찜하기")
+    @Operation(summary = "문화행사 찜하기", description = "특정 문화행사에 대해 찜하기(좋아요) 를 토글합니다.")
     @PostMapping("/likes/{cultureId}")
     public ResponseEntity<ApiResponse<Void>> toggleLike(
-            @PathVariable Long cultureId,
+            @Parameter(description = "문화행사 ID", example = "1") @PathVariable Long cultureId,
             @AuthenticationPrincipal User user) {
         cultureService.toggleLike(cultureId, user);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
-    @Operation(summary = "문화행사 위치 조회")
+    @Operation(summary = "문화행사 위치 조회", description = "특정 문화행사의 위도, 경도 위치 정보를 조회합니다.")
     @GetMapping("/location/{cultureId}")
     public ResponseEntity<ApiResponse<Map<String, String>>> getLocation(
-            @PathVariable Long cultureId) {
-        var culture = cultureService.findCultureById(cultureId);
-        Map<String, String> location = Map.of(
-                "gpsX", culture.getGpsX(),
-                "gpsY", culture.getGpsY()
-        );
-        return ResponseEntity.ok(ApiResponse.onSuccess(location));
+            @Parameter(description = "문화행사 ID", example = "1") @PathVariable Long cultureId) {
+        return ResponseEntity.ok(ApiResponse.onSuccess(cultureService.getLocation(cultureId)));
     }
 }
