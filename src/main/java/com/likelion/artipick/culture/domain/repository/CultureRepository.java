@@ -23,10 +23,12 @@ public interface CultureRepository extends JpaRepository<Culture, Long> {
 
     @Query("SELECT c FROM Culture c WHERE " +
            "(:keyword IS NULL OR c.title LIKE %:keyword% OR c.contents LIKE %:keyword%) AND " +
-           "(:location IS NULL OR c.area LIKE %:location% OR c.sigungu LIKE %:location%) AND " +
-           "(:categoryEnum IS NULL OR c.category = :categoryEnum)")
+           "(:area IS NULL OR c.area LIKE %:area%) AND " +
+           "(:sigungu IS NULL OR c.sigungu LIKE %:sigungu%) AND " +
+           "(:categories IS NULL OR c.category IN :categories)")
     Page<Culture> searchBy(@Param("keyword") String keyword,
-                           @Param("location") String location,
-                           @Param("categoryEnum") Category categoryEnum,
+                           @Param("area") String area,
+                           @Param("sigungu") String sigungu,
+                           @Param("categories") java.util.List<Category> categories,
                            Pageable pageable);
 }
