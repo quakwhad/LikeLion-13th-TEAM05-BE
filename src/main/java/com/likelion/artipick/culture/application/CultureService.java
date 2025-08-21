@@ -164,7 +164,12 @@ public class CultureService {
     }
 
     private void validateOwnership(Culture culture, User user) {
-        if (!culture.getUser().equals(user)) {
+        // 공공 API 데이터는 수정/삭제 불가
+        if (Boolean.TRUE.equals(culture.getIsFromApi())) {
+            throw new GeneralException(ErrorStatus.FORBIDDEN);
+        }
+        // 소유자 없거나 다른 유저일 경우 불가 (id 기준 비교)
+        if (culture.getUser() == null || !Objects.equals(culture.getUser().getId(), user.getId())) {
             throw new GeneralException(ErrorStatus.FORBIDDEN);
         }
     }
@@ -198,6 +203,12 @@ public class CultureService {
     @Transactional
     public Culture updateCulture(Long id, CultureRequest request, User user) {
         Culture culture = findCultureById(id);
+
+        log.info("PATCH 요청 - 문화행사 ID: {}", id);
+        log.info("DB에 저장된 작성자 ID: {}",
+                culture.getUser() != null ? culture.getUser().getId() : null);
+        log.info("현재 요청자 ID: {}", user.getId());
+
         validateOwnership(culture, user);
         culture.updateCulture(
                 request.title(),
@@ -231,7 +242,16 @@ public class CultureService {
         Culture culture = findCultureById(cultureId);
         CultureLike like = likeRepository.findByUserAndCulture(user, culture)
                 .orElse(new CultureLike(user, culture));
+        boolean before = like.isLiked();
         like.toggle();
+
+        // 좋아요 상태가 바뀌었으면 likeCount 반영
+        if (!before && like.isLiked()) {
+            culture.increaseLikeCount();
+        } else if (before && !like.isLiked()) {
+            culture.decreaseLikeCount();
+        }
+
         likeRepository.save(like);
     }
 

@@ -6,6 +6,8 @@ import com.likelion.artipick.culture.api.dto.response.CultureResponse;
 import com.likelion.artipick.culture.application.CultureService;
 import com.likelion.artipick.global.code.dto.ApiResponse;
 import com.likelion.artipick.user.domain.User;
+import com.likelion.artipick.user.domain.repository.UserRepository;
+import com.likelion.artipick.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +28,7 @@ import java.util.Map;
 public class CultureController {
 
     private final CultureService cultureService;
+    private final UserRepository userRepository;
 
     @Operation(summary = "문화행사 목록 조회", description = "문화행사 목록을 페이징하여 조회합니다.")
     @GetMapping
@@ -52,7 +55,11 @@ public class CultureController {
     @PostMapping
     public ResponseEntity<ApiResponse<CultureResponse>> createCulture(
             @RequestBody CultureRequest request,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        User user = userRepository.findById(userDetails.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         return ResponseEntity.ok(ApiResponse.onSuccess(
                 CultureResponse.from(cultureService.createCulture(request, user))));
     }
@@ -62,7 +69,11 @@ public class CultureController {
     public ResponseEntity<ApiResponse<CultureResponse>> updateCulture(
             @Parameter(description = "문화행사 ID", example = "1") @PathVariable Long cultureId,
             @RequestBody CultureRequest request,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        User user = userRepository.findById(userDetails.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         return ResponseEntity.ok(ApiResponse.onSuccess(
                 CultureResponse.from(cultureService.updateCulture(cultureId, request, user))));
     }
@@ -71,7 +82,11 @@ public class CultureController {
     @DeleteMapping("/{cultureId}")
     public ResponseEntity<ApiResponse<Void>> deleteCulture(
             @Parameter(description = "문화행사 ID", example = "1") @PathVariable Long cultureId,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        User user = userRepository.findById(userDetails.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         cultureService.deleteCulture(cultureId, user);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
@@ -80,7 +95,11 @@ public class CultureController {
     @PostMapping("/likes/{cultureId}")
     public ResponseEntity<ApiResponse<Void>> toggleLike(
             @Parameter(description = "문화행사 ID", example = "1") @PathVariable Long cultureId,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        User user = userRepository.findById(userDetails.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         cultureService.toggleLike(cultureId, user);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
