@@ -18,15 +18,18 @@ public class SearchService {
 
     private final CultureRepository cultureRepository;
 
-    public Page<Culture> searchCultures(String keyword, String location, String category, Pageable pageable) {
-        Category categoryEnum = null;
-        if (category != null && !category.isEmpty()) {
+    public Page<Culture> searchCultures(String keyword, String area, String sigungu, String category, Pageable pageable) {
+        java.util.List<Category> categoryEnums = null;
+        if (category != null && !category.isBlank()) {
             try {
-                categoryEnum = Category.fromDisplayName(category);
+                categoryEnums = java.util.Arrays.stream(category.split(","))
+                        .map(String::trim)
+                        .map(Category::fromDisplayName)
+                        .collect(java.util.stream.Collectors.toList());
             } catch (IllegalArgumentException e) {
                 throw new GeneralException(ErrorStatus.CATEGORY_NOT_FOUND);
             }
         }
-        return cultureRepository.searchBy(keyword, location, categoryEnum, pageable);
+        return cultureRepository.searchBy(keyword, area, sigungu, categoryEnums, pageable);
     }
 }

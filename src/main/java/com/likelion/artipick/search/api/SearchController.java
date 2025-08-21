@@ -28,11 +28,12 @@ public class SearchController {
     @GetMapping
     public ResponseEntity<ApiResponse<Page<CultureListResponse>>> searchCulture(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String area,
+            @RequestParam(required = false) String sigungu,
             @RequestParam(required = false) String category,
             @Parameter(description = "페이지 정보") @PageableDefault(size = 4) Pageable pageable) {
 
-        Page<CultureListResponse> cultures = searchService.searchCultures(keyword, location, category, pageable)
+        Page<CultureListResponse> cultures = searchService.searchCultures(keyword, area, sigungu, category, pageable)
                 .map(CultureListResponse::from);
 
         return ResponseEntity.ok(ApiResponse.onSuccess(cultures));
