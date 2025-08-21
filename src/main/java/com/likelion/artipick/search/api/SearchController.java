@@ -30,7 +30,7 @@ public class SearchController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) String category,
-            @Parameter(description = "페이지 정보") @PageableDefault(size = 10) Pageable pageable) {
+            @Parameter(description = "페이지 정보") @PageableDefault(size = 4) Pageable pageable) {
 
         Page<CultureListResponse> cultures = searchService.searchCultures(keyword, location, category, pageable)
                 .map(CultureListResponse::from);
