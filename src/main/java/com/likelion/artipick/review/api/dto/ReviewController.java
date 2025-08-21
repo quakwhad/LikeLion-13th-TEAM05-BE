@@ -20,19 +20,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "리뷰", description = "리뷰 관련 API")
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
+@Tag(name = "리뷰", description = "리뷰 관련 API")
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final UserRepository userRepository;
-
-    private User getUserOrThrow(CustomUserDetails userDetails) {
-        return userRepository.findById(userDetails.getUserId())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-    }
 
     @Operation(summary = "리뷰 작성")
     @PostMapping
@@ -40,10 +34,8 @@ public class ReviewController {
             @RequestBody ReviewRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        User user = getUserOrThrow(userDetails);
-
         return ResponseEntity.ok(ApiResponse.onSuccess(
-                reviewService.createReview(request, user)));
+                reviewService.createReview(request, userDetails.getUserId())));
     }
 
     @Operation(summary = "문화 컨텐츠 리뷰 목록 조회")
@@ -64,9 +56,7 @@ public class ReviewController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 10) Pageable pageable) {
 
-        User user = getUserOrThrow(userDetails);
-
-        Page<ReviewListResponse> reviews = reviewService.getReviewsByUser(user, pageable)
+        Page<ReviewListResponse> reviews = reviewService.getReviewsByUser(userDetails.getUserId(), pageable)
                 .map(ReviewListResponse::from);
 
         return ResponseEntity.ok(ApiResponse.onSuccess(reviews));
@@ -88,10 +78,8 @@ public class ReviewController {
             @RequestBody ReviewRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        User user = getUserOrThrow(userDetails);
-
         return ResponseEntity.ok(ApiResponse.onSuccess(
-                reviewService.updateReview(reviewId, request, user)));
+                reviewService.updateReview(reviewId, request, userDetails.getUserId())));
     }
 
     @Operation(summary = "리뷰 삭제")
@@ -100,9 +88,8 @@ public class ReviewController {
             @PathVariable Long reviewId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        User user = getUserOrThrow(userDetails);
-
-        reviewService.deleteReview(reviewId, user);
+        reviewService.deleteReview(reviewId, userDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 }
+
