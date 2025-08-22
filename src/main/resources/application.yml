@@ -26,6 +26,12 @@ spring:
       connection-timeout: 20000    # 연결 타임아웃 20초
       leak-detection-threshold: 60000  # 연결 누수 감지
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      timeout: 2000ms
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -74,7 +80,7 @@ kakao:
 # AI 서버 설정
 ai:
   server:
-    url: ${AI_SERVER_URL:http://localhost:9999} # 수정 필요
+    url: ${AI_SERVER_URL}
 
 # 문화 예술 정보 API
 culture:
