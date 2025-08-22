@@ -1,6 +1,5 @@
 package com.likelion.artipick.chat.api;
 
-import com.likelion.artipick.chat.api.dto.request.AiRequest;
 import com.likelion.artipick.chat.api.dto.request.ChatRequest;
 import com.likelion.artipick.chat.api.dto.response.ChatHistoryResponse;
 import com.likelion.artipick.chat.application.ChatService;
@@ -26,18 +25,11 @@ public class ChatController {
 
     @Operation(summary = "챗봇에게 메시지 전송", description = "사용자 메시지를 AI 챗봇에게 전송합니다.")
     @PostMapping("/send")
-    public ResponseEntity<ApiResponse<Void>> sendMessage(
+    public ResponseEntity<ApiResponse<String>> sendMessage(
             @Valid @RequestBody ChatRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        chatService.sendMessage(request, userDetails.getUserId()).block();
-        return ResponseEntity.ok(ApiResponse.onSuccess(null));
-    }
-
-    @Operation(summary = "챗봇 응답 받기", description = "AI 서버에서 분석된 챗봇 응답을 받습니다.")
-    @PostMapping("/receive")
-    public ResponseEntity<ApiResponse<Void>> receiveAiResponse(@Valid @RequestBody AiRequest request) {
-        chatService.receiveMessage(request).block();
-        return ResponseEntity.ok(ApiResponse.onSuccess(null));
+        String aiResponse = chatService.sendMessage(request, userDetails.getUserId()).block();
+        return ResponseEntity.ok(ApiResponse.onSuccess(aiResponse));
     }
 
     @Operation(summary = "대화 기록 조회", description = "사용자의 전체 대화 기록을 조회합니다.")

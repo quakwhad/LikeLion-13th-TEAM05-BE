@@ -1,12 +1,13 @@
 package com.likelion.artipick.chat.application;
 
-import com.likelion.artipick.chat.api.dto.request.AiRequest;
 import com.likelion.artipick.chat.api.dto.request.AiServerRequest;
 import com.likelion.artipick.chat.api.dto.request.ChatRequest;
 import com.likelion.artipick.chat.api.dto.response.ChatHistoryResponse;
 import com.likelion.artipick.chat.domain.ChatMessage;
 import com.likelion.artipick.chat.domain.MessageType;
 import com.likelion.artipick.chat.domain.repository.ChatMessageRepository;
+import com.likelion.artipick.culture.domain.Culture;
+import com.likelion.artipick.culture.domain.repository.CultureRepository;
 import com.likelion.artipick.global.code.status.ErrorStatus;
 import com.likelion.artipick.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -24,12 +26,13 @@ import java.util.List;
 public class ChatService {
 
     private final ChatMessageRepository chatMessageRepository;
+    private final CultureRepository cultureRepository;
     private final WebClient webClient;
 
     @Value("${ai.server.url}")
     private String aiServerUrl;
 
-    public Mono<Void> sendMessage(ChatRequest request, Long userId) {
+    public Mono<String> sendMessage(ChatRequest request, Long userId) {
         return Mono.fromCallable(() -> {
                     // 사용자 메시지 저장
                     ChatMessage userMessage = ChatMessage.builder()
@@ -40,38 +43,43 @@ public class ChatService {
                     return chatMessageRepository.save(userMessage);
                 })
                 .flatMap(savedMessage -> {
-                    // AI 서버로 전송할 DTO 생성
-                    AiServerRequest aiRequest = AiServerRequest.of(userId, request.message());
+                    // 현재 진행 중인 문화행사 조회 (상위 50개만)
+                    return Mono.fromCallable(() -> {
+                        LocalDate today = LocalDate.now();
+                        List<Culture> allCultures = cultureRepository.findByEndDateGreaterThanEqualOrderByViewCountDescLikeCountDesc(today);
+                        
+                        // AI 서버 부하 방지를 위해 인기 상위 50개만 전송
+                        return allCultures.stream()
+                                .limit(50)
+                                .toList();
+                    });
+                })
+                .flatMap(cultures -> {
+                    // AI 서버에 메시지 + 문화행사 데이터 전송
+                    AiServerRequest aiRequest = AiServerRequest.of(userId, request.message(), cultures);
 
-                    // AI 서버로 비동기 전송
                     return webClient.post()
-                            .uri(aiServerUrl + "/chat")
+                            .uri(aiServerUrl + "/ask")
+                            .header("Content-Type", "application/json")
                             .bodyValue(aiRequest)
                             .retrieve()
-                            .bodyToMono(String.class)
-                            .doOnNext(response -> log.info("AI 서버 응답 성공: {}", response))
-                            .then(); // 응답 내용은 무시하고 완료 신호만 전달
+                            .bodyToMono(String.class)  // AI가 자연어로 응답
+                            .flatMap(aiResponse -> {
+                                // AI 응답 저장
+                                return Mono.fromCallable(() -> {
+                                    ChatMessage aiMessage = ChatMessage.builder()
+                                            .userId(userId)
+                                            .content(aiResponse)
+                                            .messageType(MessageType.AI)
+                                            .build();
+                                    chatMessageRepository.save(aiMessage);
+                                    return aiResponse;  // 자연어 응답 반환
+                                });
+                            });
                 })
                 .onErrorMap(e -> {
-                    log.error("AI 서버 통신 오류", e);
+                    log.error("채팅 처리 오류", e);
                     return new GeneralException(ErrorStatus.AI_SERVER_ERROR);
-                });
-    }
-
-    public Mono<Void> receiveMessage(AiRequest request) {
-        return Mono.fromCallable(() -> {
-                    ChatMessage aiResponse = ChatMessage.builder()
-                            .userId(request.userId())
-                            .content(request.response())
-                            .messageType(MessageType.AI)
-                            .build();
-                    return chatMessageRepository.save(aiResponse);
-                })
-                .doOnNext(savedMessage -> log.info("AI 응답 저장 완료: {}", savedMessage.getId()))
-                .then()  // 저장 완료 후 Void 반환
-                .onErrorMap(e -> {
-                    log.error("채팅 메시지 저장 오류", e);
-                    return new GeneralException(ErrorStatus.CHAT_SAVE_ERROR);
                 });
     }
 
