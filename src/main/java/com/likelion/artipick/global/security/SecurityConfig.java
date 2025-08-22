@@ -40,7 +40,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
                                 "/swagger-resources/**", "/webjars/**",
-                                "/auth/login", "/auth/reissue", "/api/weather/**", "/api/location/**"
+                                "/auth/login", "/auth/reissue", "/api/weather/**", "/api/location/**",
+                                "/api/search/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/cultures/**").permitAll()
                         .requestMatchers("/api/**").authenticated()
@@ -55,7 +56,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173",
-                "https://artipick.duckdns.org"));
+                "https://artipick.duckdns.org", "https://artipick.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "RefreshToken", "id_token", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "RefreshToken"));

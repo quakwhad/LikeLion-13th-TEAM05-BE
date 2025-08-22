@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +18,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+
+
+@Slf4j
 
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
@@ -70,7 +74,10 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 .ifPresent(accessToken -> {
                     String email = jwtService.verifyTokenAndGetEmail(accessToken);
                     userRepository.findByEmail(email)
-                            .ifPresent(this::saveAuthentication);
+                            .ifPresent(user -> {
+                                log.info("JWT 인증 성공 - userId: {}", user.getId());
+                                saveAuthentication(user);
+                            });
                 });
 
         filterChain.doFilter(request, response);
