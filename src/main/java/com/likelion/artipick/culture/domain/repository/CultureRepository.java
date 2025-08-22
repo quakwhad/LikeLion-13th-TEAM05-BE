@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface CultureRepository extends JpaRepository<Culture, Long> {
@@ -31,4 +33,8 @@ public interface CultureRepository extends JpaRepository<Culture, Long> {
                            @Param("sigungu") String sigungu,
                            @Param("categories") java.util.List<Category> categories,
                            Pageable pageable);
+
+    List<Culture> findByEndDateGreaterThanEqualOrderByViewCountDescLikeCountDesc(LocalDate date);
+
+    List<Culture> findByIdInAndEndDateGreaterThanEqual(List<Long> ids, LocalDate date);
 }
