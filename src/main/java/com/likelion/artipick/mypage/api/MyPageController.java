@@ -2,6 +2,7 @@ package com.likelion.artipick.mypage.api;
 
 import com.likelion.artipick.global.code.dto.ApiResponse;
 import com.likelion.artipick.global.security.CustomUserDetails;
+import com.likelion.artipick.mypage.api.dto.response.MyPageCultureResponseDto;
 import com.likelion.artipick.mypage.api.dto.response.MyPagePlaceResponseDto;
 import com.likelion.artipick.mypage.api.dto.response.MyPageUserResponseDto;
 import com.likelion.artipick.mypage.api.dto.request.ProfileUpdateRequestDto;
@@ -47,5 +48,14 @@ public class MyPageController {
             Pageable pageable) {
         Page<MyPagePlaceResponseDto> bookmarkedPlaces = myPageService.getBookmarkedPlaces(userDetails.getUserId(), pageable);
         return ResponseEntity.ok(ApiResponse.onSuccess(bookmarkedPlaces));
+    }
+
+    @Operation(summary = "내가 찜한 문화생활 목록 조회")
+    @GetMapping("/likes")
+    public ResponseEntity<ApiResponse<Page<MyPageCultureResponseDto>>> getMyLikedCultures(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Pageable pageable) {
+        Page<MyPageCultureResponseDto> likedCultures = myPageService.getLikedCultures(userDetails.getUserId(), pageable);
+        return ResponseEntity.ok(ApiResponse.onSuccess(likedCultures));
     }
 }
