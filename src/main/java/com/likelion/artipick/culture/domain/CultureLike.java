@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "culture_like")
+@Table(name = "culture_like",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "culture_id"})
+)
 public class CultureLike {
 
     @Id

@@ -38,8 +38,13 @@ public record CultureListResponse(
         @Schema(description = "API 데이터 여부", example = "true")
         Boolean isFromApi,
 
+        @Schema(description = "조회수", example = "123")
+        int viewCount,
+
         @Schema(description = "좋아요 수", example = "12")
         int likeCount
+
+
 ) {
     public static CultureListResponse from(Culture culture) {
         return new CultureListResponse(
@@ -53,6 +58,7 @@ public record CultureListResponse(
                 culture.getPrice(),
                 culture.getImgUrl(),
                 culture.getIsFromApi(),
+                culture.getViewCount(),
                 culture.getLikeCount()
         );
     }
