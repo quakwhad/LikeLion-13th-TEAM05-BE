@@ -1,8 +1,10 @@
 package com.likelion.artipick.mypage.application;
 
+import com.likelion.artipick.culture.domain.repository.CultureLikeRepository;
 import com.likelion.artipick.global.code.status.ErrorStatus;
 import com.likelion.artipick.global.exception.GeneralException;
 
+import com.likelion.artipick.mypage.api.dto.response.MyPageCultureResponseDto;
 import com.likelion.artipick.mypage.api.dto.response.MyPagePlaceResponseDto;
 import com.likelion.artipick.mypage.api.dto.response.MyPageUserResponseDto;
 import com.likelion.artipick.mypage.api.dto.request.ProfileUpdateRequestDto;
@@ -27,6 +29,7 @@ public class MyPageService {
     private final UserRepository userRepository;
     private final PlaceBookmarkRepository placeBookmarkRepository;
     private final InterestCategoryRepository interestCategoryRepository;
+    private final CultureLikeRepository cultureLikeRepository;
 
     public MyPageUserResponseDto getMyPageInfo(Long userId) {
         User user = userRepository.findById(userId)
@@ -50,5 +53,10 @@ public class MyPageService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         user.updateProfile(profileUpdateRequestDto.nickname(), profileUpdateRequestDto.introduction());
+    }
+
+    public Page<MyPageCultureResponseDto> getLikedCultures(Long userId, Pageable pageable) {
+        return cultureLikeRepository.findAllByUserIdAndLikedTrue(userId, pageable)
+                .map(cultureLike -> MyPageCultureResponseDto.from(cultureLike.getCulture()));
     }
 }
