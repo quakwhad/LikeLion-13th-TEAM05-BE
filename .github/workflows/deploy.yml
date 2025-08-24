@@ -72,7 +72,7 @@ jobs:
             docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
             
             # 새 컨테이너 실행 (환경 변수 전달)
-            docker run -d --name my-app -p 8080:8080 \
+            docker run -d --name my-app --network host \
               -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
               -e JWT_ACCESS_EXPIRATION=${{ secrets.JWT_ACCESS_EXPIRATION }} \
               -e JWT_ACCESS_HEADER=${{ secrets.JWT_ACCESS_HEADER }} \
