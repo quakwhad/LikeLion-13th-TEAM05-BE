@@ -15,10 +15,10 @@ spring:
     include:
       - secret
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:artipick}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:1234}
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
     hikari:
       maximum-pool-size: 30        # 연결 풀 크기 증가
